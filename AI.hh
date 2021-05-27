@@ -9,7 +9,8 @@ class AI
 {
 public:
     bool isMoveLeft(Board board);
-    int evaluate(Board board);
-    int minimax(Board board, int depth, bool isMax);
-    Move findBestMove(Board board);
+    bool evaluate(Board board);
+    int minimax(Board board, int depth, bool isAI);
+    Move findBestMove(Board board, int moveIndex);
+    // bool gameOver(Board board);
 };

@@ -18,7 +18,7 @@ bool AI::isMoveLeft(Board board)
     return false;
 }
 
-int AI::evaluate(Board board)
+bool AI::evaluate(Board board)
 {
     int counter;
 
@@ -45,11 +45,11 @@ int AI::evaluate(Board board)
 
         if (counter == board.size)
         {
-            if (prevRow == 'X')
-                return 10;
+            if (prevRow != ' ')
+                return true;
 
-            if (prevRow == 'O')
-                return -10;
+            // if (prevRow == 'O')
+            //     return -10;
         }
     }
 
@@ -75,11 +75,11 @@ int AI::evaluate(Board board)
             continue;
         if (counter == board.size)
         {
-            if (prevCol == 'X')
-                return 10;
+            if (prevCol != ' ')
+                return true;
 
-            else if (prevCol == 'O')
-                return -10;
+            // if (prevCol == 'O')
+            //     return -10;
         }
     }
 
@@ -103,11 +103,11 @@ int AI::evaluate(Board board)
     }
     if (counter == board.size)
     {
-        if (prevDiagonal == 'X')
-            return 10;
+        if (prevDiagonal != ' ')
+            return true;
 
-        else if (prevDiagonal == 'O')
-            return -10;
+        // if (prevDiagonal == 'O')
+        //     return -10;
     }
 
     // checking second diagonal for victory
@@ -132,125 +132,111 @@ int AI::evaluate(Board board)
     }
     if (counter == board.size)
     {
-        if (prevDiagonal == 'X')
-            return 10;
+        if (prevDiagonal != ' ')
+            return true;
 
-        else if (prevDiagonal == 'O')
-            return -10;
+        // if (prevDiagonal == 'O')
+        //     return -10;
     }
 
     // if there's no victory
-    return 0;
+    return false;
 }
 
-int AI::minimax(Board board, int depth, bool isMax)
+int AI::minimax(Board board, int depth, bool isAI)
 {
-    int score = evaluate(board);
-
-    if (score != 0)
-        return score;
-
-    if (isMoveLeft(board) == false)
-        return 0;
-
-    if (isMax)
+    int score = 0;
+    int bestScore = 0;
+    if (evaluate(board))
     {
-        int best = -1000;
-
-        // Traverse all cells
-        for (int i = 0; i < board.size; i++)
-        {
-            for (int j = 0; j < board.size; j++)
-            {
-                // Check if cell is empty
-                if (board.fields[i][j] == ' ')
-                {
-                    // Make the move
-                    board.fields[i][j] = 'X';
-
-                    // Call minimax recursively and choose
-                    // the maximum value
-                    best = std::max(best,
-                                    minimax(board, depth + 1, !isMax));
-
-                    // Undo the move
-                    board.fields[i][j] = ' ';
-                }
-            }
-        }
-        return best;
+       // std::cout << "Evaluated" << std::endl;
+        if (isAI == true)
+            return -1;
+        if (isAI == false)
+            return +1;
     }
-
     else
     {
-        int best = 1000;
-
-        // Traverse all cells
-        for (int i = 0; i < board.size; i++)
+        if (depth < board.size * board.size && depth > board.size * board.size - 10)
         {
-            for (int j = 0; j < board.size; j++)
+            if (isAI == true)
             {
-                // Check if cell is empty
-                if (board.fields[i][j] == ' ')
+                bestScore = -999;
+                for (int i = 0; i < board.size; i++)
                 {
-                    // Make the move
-                    board.fields[i][j] = 'O';
-
-                    // Call minimax recursively and choose
-                    // the minimum value
-                    best = std::min(best,
-                                    minimax(board, depth + 1, !isMax));
-
-                    // Undo the move
-                    board.fields[i][j] = ' ';
+                    for (int j = 0; j < board.size; j++)
+                    {
+                        if (board.fields[i][j] == ' ')
+                        {
+                            board.fields[i][j] = 'O';
+                            score = minimax(board, depth + 1, false);
+                            board.fields[i][j] = ' ';
+                            if (score > bestScore)
+                            {
+                                bestScore = score;
+                            }
+                        }
+                    }
                 }
+                return bestScore;
+            }
+            else
+            {
+                bestScore = 999;
+                for (int i = 0; i < board.size; i++)
+                {
+                    for (int j = 0; j < board.size; j++)
+                    {
+                        if (board.fields[i][j] == ' ')
+                        {
+                            board.fields[i][j] = 'X';
+                            score = minimax(board, depth + 1, true);
+                            board.fields[i][j] = ' ';
+                            if (score < bestScore)
+                            {
+                                bestScore = score;
+                            }
+                        }
+                    }
+                }
+                return bestScore;
             }
         }
-        return best;
+        else
+        {
+            return 0;
+        }
     }
 }
 
-Move AI::findBestMove(Board board)
+Move AI::findBestMove(Board board, int moveIndex)
 {
-    int bestVal = -1000;
+    int x = -1, y = -1;
+    int score = 0, bestScore = -999;
     Move bestMove;
-    bestMove.row = -1;
-    bestMove.col = -1;
 
-    // Traverse all cells, evaluate minimax function for
-    // all empty cells. And return the cell with optimal
-    // value.
     for (int i = 0; i < board.size; i++)
     {
         for (int j = 0; j < board.size; j++)
         {
-            // Check if cell is empty
             if (board.fields[i][j] == ' ')
             {
-                // Make the move
                 board.fields[i][j] = 'O';
-
-                // compute evaluation function for this
-                // move.
-                int moveVal = minimax(board, 0, false);
-
-                // Undo the move
+                score = minimax(board, moveIndex + 1, false);
                 board.fields[i][j] = ' ';
-
-                // If the value of the current move is
-                // more than the best value, then update
-                // best/
-                if (moveVal > bestVal)
+                if (score > bestScore)
                 {
+                    bestScore = score;
+                    x = i;
+                    y = j;
                     bestMove.row = i;
                     bestMove.col = j;
-                    bestVal = moveVal;
                 }
             }
         }
     }
 
-    std::cout << "The value of the best Move is: " << bestVal << std::endl;
+    // std::cout << "The value of the best Move is: " << bestScore << std::endl;
     std::cout << "Move " << bestMove.row + 1 << "-" << bestMove.col + 1 << std::endl;
 
     return bestMove;
