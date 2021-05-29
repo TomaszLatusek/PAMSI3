@@ -36,21 +36,14 @@ bool AI::evaluate(Board board)
                 {
                     counter++;
                 }
-                else if (prevRow == ' ')
-                {
-                    counter = 1;
-                }
                 else
                 {
-                    counter = 0;
+                    counter = 1;
                 }
             }
 
             if (counter >= board.inRowToWin)
-            {
-                std::cout << "There's a winning row!" << std::endl;
                 return true;
-            }
 
             prevRow = board.fields[row][j];
         }
@@ -70,21 +63,14 @@ bool AI::evaluate(Board board)
                 {
                     counter++;
                 }
-                else if (prevRow == ' ')
-                {
-                    counter = 1;
-                }
                 else
                 {
-                    counter = 0;
+                    counter = 1;
                 }
             }
 
             if (counter >= board.inRowToWin)
-            {
-                std::cout << "There's a winning column!" << std::endl;
                 return true;
-            }
 
             prevRow = board.fields[i][column];
         }
@@ -105,21 +91,14 @@ bool AI::evaluate(Board board)
                 {
                     counterD++;
                 }
-                else if (prevDiagonalD == ' ')
-                {
-                    counterD = 1;
-                }
                 else
                 {
-                    counterD = 0;
+                    counterD = 1;
                 }
             }
 
             if (counterD >= board.inRowToWin)
-            {
-                std::cout << "There's a winning diagonal! (UD_D)" << std::endl;
                 return true;
-            }
 
             if (board.fields[i - k][i] != ' ')
             {
@@ -127,21 +106,14 @@ bool AI::evaluate(Board board)
                 {
                     counterU++;
                 }
-                else if (prevDiagonalU == ' ')
-                {
-                    counterU = 1;
-                }
                 else
                 {
-                    counterU = 0;
+                    counterU = 1;
                 }
             }
 
             if (counterU >= board.inRowToWin)
-            {
-                std::cout << "There's a winning diagonal! (UD_U)" << std::endl;
                 return true;
-            }
 
             prevDiagonalD = board.fields[i][i - k];
             prevDiagonalU = board.fields[i - k][i];
@@ -175,10 +147,8 @@ bool AI::evaluate(Board board)
                 }
 
                 if (counter >= board.inRowToWin)
-                {
-                    std::cout << "There's a winning diagonal! (DU)" << std::endl;
                     return true;
-                }
+
                 prev = board.fields[i][j];
             }
         }
@@ -254,35 +224,47 @@ int AI::minimax(Board board, int depth, bool isAI)
     }
 }
 
-Move AI::findBestMove(Board board, int moveIndex)
+void AI::findBestMove(Board board, int moveIndex)
 {
     int x = -1, y = -1;
     int score = 0, bestScore = -999;
-    Move bestMove;
+    // Move bestMove;
 
-    for (int i = 0; i < board.size; i++)
+    if (board.size * board.size - moveIndex < 10)
     {
-        for (int j = 0; j < board.size; j++)
+        for (int i = 0; i < board.size; i++)
         {
-            if (board.fields[i][j] == ' ')
+            for (int j = 0; j < board.size; j++)
             {
-                board.fields[i][j] = 'O';
-                score = minimax(board, moveIndex + 1, false);
-                board.fields[i][j] = ' ';
-                if (score > bestScore)
+                if (board.fields[i][j] == ' ')
                 {
-                    bestScore = score;
-                    x = i;
-                    y = j;
-                    bestMove.row = i;
-                    bestMove.col = j;
+                    board.fields[i][j] = 'O';
+                    score = minimax(board, moveIndex + 1, false);
+                    board.fields[i][j] = ' ';
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        x = i;
+                        y = j;
+                        // bestMove.row = i;
+                        // bestMove.col = j;
+                    }
                 }
             }
         }
+        board.makeMove(x + 1, y + 1, 'O');
     }
+    else
+        findBestMove(board, board.size * board.size - 3);
+}
 
-    // std::cout << "The value of the best Move is: " << bestScore << std::endl;
-    std::cout << "Move " << bestMove.row + 1 << "-" << bestMove.col + 1 << std::endl;
+void AI::randomMove(Board board)
+{
+    int row = rand() % board.size;
+    int col = rand() % board.size;
 
-    return bestMove;
+    if (board.fields[row][col] == ' ')
+    {
+        board.makeMove(row + 1, col + 1, 'O');
+    }
 }

@@ -28,6 +28,25 @@ Board::~Board()
     // delete fields;
 }
 
+void Board::init()
+{
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = 0; j < size; j++)
+        {
+            fields[i][j] = ' ';
+        }
+    }
+}
+
+bool Board::isFieldEmpty(int i, int j)
+{
+    if (fields[i][j] == ' ')
+        return true;
+    else
+        return false;
+}
+
 void Board::print()
 {
     system("clear");

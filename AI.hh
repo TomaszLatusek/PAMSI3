@@ -1,4 +1,5 @@
 #include "Board.hh"
+#include <stdlib.h>
 
 struct Move
 {
@@ -11,6 +12,6 @@ public:
     bool isMoveLeft(Board board);
     bool evaluate(Board board);
     int minimax(Board board, int depth, bool isAI);
-    Move findBestMove(Board board, int moveIndex);
-    // bool gameOver(Board board);
+    void randomMove(Board board);
+    void findBestMove(Board board, int moveIndex);
 };
