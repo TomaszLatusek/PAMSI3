@@ -118,11 +118,13 @@ void Game::playerTurn()
             playerTurn();
         }
     }
+    playerLastMove.row = row - 1;
+    playerLastMove.col = col - 1;
 }
 
 bool Game::gameOver(int whoseTurn)
 {
-    if (bot.evaluate(*board))
+    if (bot.evaluate(*board, playerLastMove.row, playerLastMove.col))
     {
         if (whoseTurn == BOT)
         {
@@ -142,11 +144,11 @@ void Game::play(int whoseTurn)
 {
     int moveIndex = 0;
 
-    while (!bot.evaluate(*board) && moveIndex < board->getSize() * board->getSize())
+    while (!bot.evaluate(*board, playerLastMove.row, playerLastMove.col) && moveIndex < board->getSize() * board->getSize())
     {
         if (whoseTurn == BOT)
         {
-            bot.findBestMove(*board, moveIndex);
+            bot.findBestMove(*board, moveIndex, playerLastMove);
             moveIndex++;
             whoseTurn = PLAYER;
         }

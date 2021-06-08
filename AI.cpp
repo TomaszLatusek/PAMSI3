@@ -18,7 +18,7 @@ bool AI::isMoveLeft(Board board)
     return false;
 }
 
-bool AI::evaluate(Board board)
+bool AI::evaluate(Board board, int ii, int jj)
 {
     int counter;
 
@@ -158,13 +158,14 @@ bool AI::evaluate(Board board)
     return false;
 }
 
-int AI::minimax(Board board, int depth, bool isAI)
+int AI::minimax(Board board, int depth, bool isAI, Move lastMove)
 {
     int score = 0;
     int bestScore = 0;
-    if (evaluate(board))
+    Move moveCopy;
+
+    if (evaluate(board, lastMove.row, lastMove.col))
     {
-        // std::cout << "Evaluated" << std::endl;
         if (isAI == true)
             return -1;
         if (isAI == false)
@@ -172,7 +173,7 @@ int AI::minimax(Board board, int depth, bool isAI)
     }
     else
     {
-        if (depth < board.size * board.size && depth > board.size * board.size - 10)
+        if (depth < board.size * board.size)
         {
             if (isAI == true)
             {
@@ -184,7 +185,9 @@ int AI::minimax(Board board, int depth, bool isAI)
                         if (board.fields[i][j] == ' ')
                         {
                             board.fields[i][j] = 'O';
-                            score = minimax(board, depth + 1, false);
+                            moveCopy.row = i;
+                            moveCopy.col = j;
+                            score = minimax(board, depth + 1, false, moveCopy);
                             board.fields[i][j] = ' ';
                             if (score > bestScore)
                             {
@@ -205,7 +208,9 @@ int AI::minimax(Board board, int depth, bool isAI)
                         if (board.fields[i][j] == ' ')
                         {
                             board.fields[i][j] = 'X';
-                            score = minimax(board, depth + 1, true);
+                            moveCopy.row = i;
+                            moveCopy.col = j;
+                            score = minimax(board, depth + 1, true, moveCopy);
                             board.fields[i][j] = ' ';
                             if (score < bestScore)
                             {
@@ -224,14 +229,13 @@ int AI::minimax(Board board, int depth, bool isAI)
     }
 }
 
-void AI::findBestMove(Board board, int moveIndex)
+void AI::findBestMove(Board board, int moveIndex, Move playerLastMove)
 {
     int x = -1, y = -1;
     int score = 0, bestScore = -999;
-    // Move bestMove;
 
-    if (board.size * board.size - moveIndex < 10)
-    {
+    // if (board.size * board.size - moveIndex < 10)
+    // {
         for (int i = 0; i < board.size; i++)
         {
             for (int j = 0; j < board.size; j++)
@@ -239,23 +243,21 @@ void AI::findBestMove(Board board, int moveIndex)
                 if (board.fields[i][j] == ' ')
                 {
                     board.fields[i][j] = 'O';
-                    score = minimax(board, moveIndex + 1, false);
+                    score = minimax(board, moveIndex + 1, false, playerLastMove);
                     board.fields[i][j] = ' ';
                     if (score > bestScore)
                     {
                         bestScore = score;
                         x = i;
                         y = j;
-                        // bestMove.row = i;
-                        // bestMove.col = j;
                     }
                 }
             }
         }
         board.makeMove(x + 1, y + 1, 'O');
-    }
-    else
-        findBestMove(board, board.size * board.size - 3);
+    // }
+    // else
+    //     findBestMove(board, board.size * board.size - 3);
 }
 
 void AI::randomMove(Board board)
